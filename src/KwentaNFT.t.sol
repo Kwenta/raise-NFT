@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity ^0.8.6;
+pragma solidity ^0.8.10;
 
 import "ds-test/test.sol";
 
-import "./KwentaNft2.sol";
+import "./KwentaNFT.sol";
 
-contract KwentaNft2Test is DSTest {
-    KwentaNft2 nft;
+contract KwentaNFTTest is DSTest {
+    KwentaNFT kwentaNFT;
 
     function setUp() public {
-        nft = new KwentaNft2();
+        kwentaNFT = new KwentaNFT();
     }
 
     function testFail_basic_sanity() public {
