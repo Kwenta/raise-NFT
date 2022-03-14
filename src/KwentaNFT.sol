@@ -6,27 +6,26 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 
 error HasDistributed(bool hasDistributed);
+error InequalInputArrays(uint256 recipientsLength, uint256 tokenIdsLength);
+error MintingIsDisabled(
+    address account,
+    uint256 id,
+    uint256 amount,
+    bytes data
+);
 
 // 1. Should be one contract
 contract KwentaNFT is ERC1155, AccessControl, ERC1155Supply {
-    event KwentaNFTsDistributed();
+    event Distributed();
     event MintingDisabled();
-    event MintingEnabled();
+    // event MintingEnabled();
 
-    error DistributeToMultipleAccounts(
-        address[] to,
-        uint256[] tokenIds,
-        uint256[] amounts,
-        TokenTier[] tiers
-    );
-
-    //
     struct Recipient {
         address account;
-        TokenTier[] tokens;
+        TieredToken[] tieredTokens;
     }
 
-    struct TokenTier {
+    struct TieredToken {
         uint256 tokenId;
         bytes32 tier;
     }
@@ -39,17 +38,15 @@ contract KwentaNFT is ERC1155, AccessControl, ERC1155Supply {
     bytes32 public constant TIER_1 = keccak256("TIER_1");
     bytes32 public constant TIER_2 = keccak256("TIER_2");
     bytes32 public constant TIER_3 = keccak256("TIER_3");
+
     // Other state vars
     bool hasDistributed;
+    bool isMintingDisabled;
 
-    // 4. Tiers should be stored in blocks of token ids (Tier 0: 1-100, Tier 1:
-    //    101-150, etc.)
-    mapping(uint256 => TokenTier) tier0s;
-    mapping(uint256 => TokenTier) tier1s;
-    mapping(uint256 => TokenTier) tier2s;
-    mapping(uint256 => TokenTier) tier3s;
     // 5. Leave open how many token ids go into each tier
     mapping(address => Recipient) recipients;
+    // Used to fetch the tier for a tokenId.
+    mapping(uint256 => bytes32) tieredTokens;
 
     constructor(string memory uri) ERC1155(uri) {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -57,8 +54,8 @@ contract KwentaNFT is ERC1155, AccessControl, ERC1155Supply {
         _grantRole(MINTER_ROLE, msg.sender);
     }
 
-    function setURI(string memory newuri) public onlyRole(URI_SETTER_ROLE) {
-        _setURI(newuri);
+    function setURI(string memory newUri) public onlyRole(URI_SETTER_ROLE) {
+        _setURI(newUri);
     }
 
     // 8. There should not be a public mint function
@@ -71,18 +68,7 @@ contract KwentaNFT is ERC1155, AccessControl, ERC1155Supply {
         _mint(account, id, amount, data);
     }
 
-    // 8. There should not be a public mint function
-    function mintBatch(
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
-    ) internal {
-        _mintBatch(to, ids, amounts, data);
-    }
-
     /**
-     * @dev // todo: finish this function!!
      * 6. Should be allowed to do a one-time distribution, full control over
      *  minting function.
      *
@@ -93,104 +79,212 @@ contract KwentaNFT is ERC1155, AccessControl, ERC1155Supply {
      *    `tokenIds` inputs are each arrays of size 1 x 4 where each subarray in
      *    the array maps to a specific tier.
      *
-     *    Example:  address[][] _recipients = [
-     *                                         tier0Recipients,
-     *                                         tier1Recipients,
-     *                                         tier2Recipients,
-     *                                         tier3Recipients
-     *                                        ]
-     *             uint256[][] _tokenIds = [
-     *                                      tier0TokenIds,
-     *                                      tier1TokenIds,
-     *                                      tier2TokenIds,
-     *                                      tier3TokenIds
+     * Example:  address[][] _recipients = [
+     *                                      tier0Recipients,
+     *                                      tier1Recipients,
+     *                                      tier2Recipients,
+     *                                      tier3Recipients
      *                                     ]
+     *           uint256[][] _tokenIds = [
+     *                                    tier0TokenIds,
+     *                                    tier1TokenIds,
+     *                                    tier2TokenIds,
+     *                                    tier3TokenIds
+     *                                   ]
      */
-    function distributeNFTs(
-        address _account,
-        address[][] memory _recipients,
-        uint256[][] memory _tokenIds,
-        bytes memory _data
-    ) public onlyRole(MINTER_ROLE) {
+    function distribute(
+        address[][] calldata _recipients,
+        uint256[][] calldata _tokenIds
+    ) external onlyRole(MINTER_ROLE) {
         if (hasDistributed == false) {
             revert HasDistributed({hasDistributed: hasDistributed});
         }
 
-        if (_to.length == 1 && _tokenIds.length == 1 && _amounts.length == 1) {
-            revert DistributeToMultipleAccounts({
-                to: _to,
-                tokenIds: _tokenIds,
-                amounts: _amounts,
-                tiers: _tiers
-            });
+        if (_tokenIds.length != _recipients.length) {
+            revert InequalInputArrays(_recipients.length, _tokenIds.length);
         }
-        // todo: finish this function!!
-        // 7. Should be able to mint in large batches
-        if (_to.length > 1 && _tokenIds.length > 1 && _amounts.length > 1) {
-            // todo Figure out how tf do you handle batch mints to specific
-            //      accounts!! ༼ つ ◕_◕ ༽つ
-            for (uint256 i = 0; i < _to.length; i++) {
-                if (recipients[_to[i]].account.length > 1) {
-                    Recipient recipient_ = recipients[_to[i]];
 
-                    TokenTier memory tokenTier = TokenTier(
-                        _tokenIds[i],
-                        _tiers[i]
+        // todo: Need to check:
+        //         1. how much gas this consumes
+        //         2. whether we can turn this function to an external function
+        //            to save on gas
+
+        //  4. Tiers should be stored in blocks of token ids (Tier 0: 1-100,
+        //     Tier 1: 101-150, etc.)
+        // If TIER_0
+        if (abi.encodePacked(_recipients[0][0]).length == 0) {
+            for (uint256 i; i < _recipients[0].length; i++) {
+                TieredToken memory tieredToken = TieredToken(
+                    _tokenIds[0][i],
+                    TIER_0
+                );
+
+                // If there is no `Recipient` found in mapping
+                if (
+                    (abi
+                        .encodePacked(recipients[_recipients[0][i]].account)
+                        .length == 0)
+                ) {
+                    TieredToken[] memory tieredToken_;
+                    Recipient memory recipient_ = Recipient(
+                        _recipients[0][i],
+                        tieredToken_
                     );
 
-                    // 4. Tiers should be stored in blocks of token ids (Tier 0:
-                    //    1-100, Tier 1: 101-150, etc.)
-                    if (tokenTier.tier == TIER_0) {
-                        tier0s[tokenIds[i]];
-                    }
+                    recipient_ = recipients[_recipients[0][i]];
 
-                    if (tokenTier.tier == TIER_1) {
-                        tier1s[tokenIds[i]];
-                    }
+                    // Store recipient
+                    recipients[_recipients[0][i]] = recipient_;
 
-                    if (tokenTier.tier == TIER_2) {
-                        tier2s[tokenIds[i]];
-                    }
+                    // Mint token to recipient
+                    bytes memory TIER_0_ = abi.encodePacked(TIER_0);
+                    _mint(_recipients[0][i], _tokenIds[0][i], 1, TIER_0_);
+                } else {
+                    // Fetch `recipient_` and add new `tieredToken`
+                    recipients[_recipients[0][i]].tieredTokens.push(
+                        tieredToken
+                    );
 
-                    if (tokenTier.tier == TIER_3) {
-                        tier3s[tokenIds[i]];
-                    }
+                    // Mint token to recipient
+                    bytes memory TIER_0_ = abi.encodePacked(TIER_0);
+                    _mint(_recipients[0][i], _tokenIds[0][i], 1, TIER_0_);
+                }
+            }
+        }
 
-                    recipient_.tokens.push(tokenTier);
+        // If TIER_1
+        if (abi.encodePacked(_recipients[1][0]).length == 0) {
+            for (uint256 i; i < _recipients[1].length; i++) {
+                TieredToken memory tieredToken = TieredToken(
+                    _tokenIds[1][i],
+                    TIER_1
+                );
 
-                    _mintBatch(_to[i], _tokenIds, _amounts, _data);
-                } else {}
+                // If there is no `Recipient` found in mapping
+                if (
+                    (abi
+                        .encodePacked(recipients[_recipients[1][i]].account)
+                        .length == 0)
+                ) {
+                    TieredToken[] memory tieredToken_;
+                    Recipient memory recipient_ = Recipient(
+                        _recipients[1][i],
+                        tieredToken_
+                    );
 
-                TokenTier memory tokenTier_;
+                    recipient_ = recipients[_recipients[1][i]];
+
+                    // Store recipient
+                    recipients[_recipients[1][i]] = recipient_;
+
+                    // Mint token to recipient
+                    bytes memory TIER_1_ = abi.encodePacked(TIER_1);
+                    _mint(_recipients[1][i], _tokenIds[1][i], 1, TIER_1_);
+                } else {
+                    // Fetch `recipient_` and add new `tieredToken`
+                    recipients[_recipients[1][i]].tieredTokens.push(
+                        tieredToken
+                    );
+
+                    // Mint token to recipient
+                    bytes memory TIER_1_ = abi.encodePacked(TIER_1);
+                    _mint(_recipients[1][i], _tokenIds[1][i], 1, TIER_1_);
+                }
+            }
+        }
+
+        // If TIER_2
+        if (abi.encodePacked(_recipients[2][0]).length == 0) {
+            for (uint256 i; i < _recipients[2].length; i++) {
+                TieredToken memory tieredToken = TieredToken(
+                    _tokenIds[2][i],
+                    TIER_2
+                );
+
+                // If there is no `Recipient` found in mapping
+                if (
+                    (abi
+                        .encodePacked(recipients[_recipients[2][i]].account)
+                        .length == 0)
+                ) {
+                    TieredToken[] memory tieredToken_;
+                    Recipient memory recipient_ = Recipient(
+                        _recipients[2][i],
+                        tieredToken_
+                    );
+
+                    recipient_ = recipients[_recipients[2][i]];
+
+                    // Store recipient
+                    recipients[_recipients[2][i]] = recipient_;
+
+                    // Mint token to recipient
+                    bytes memory TIER_2_ = abi.encodePacked(TIER_2);
+                    _mint(_recipients[2][i], _tokenIds[2][i], 1, TIER_2_);
+                } else {
+                    // Fetch `recipient_` and add new `tieredToken`
+                    recipients[_recipients[2][i]].tieredTokens.push(
+                        tieredToken
+                    );
+
+                    // Mint token to recipient
+                    bytes memory TIER_2_ = abi.encodePacked(TIER_2);
+                    _mint(_recipients[2][i], _tokenIds[2][i], 1, TIER_2_);
+                }
+            }
+        }
+
+        // If TIER_3
+        if (abi.encodePacked(_recipients[3][0]).length == 0) {
+            for (uint256 i; i < _recipients[3].length; i++) {
+                TieredToken memory tieredToken = TieredToken(
+                    _tokenIds[3][i],
+                    TIER_3
+                );
+
+                // If there is no `Recipient` found in mapping
+                if (
+                    (abi
+                        .encodePacked(recipients[_recipients[3][i]].account)
+                        .length == 0)
+                ) {
+                    TieredToken[] memory tieredToken_;
+                    Recipient memory recipient_ = Recipient(
+                        _recipients[3][i],
+                        tieredToken_
+                    );
+
+                    recipient_ = recipients[_recipients[3][i]];
+
+                    // Store recipient
+                    recipients[_recipients[3][i]] = recipient_;
+
+                    // Mint token to recipient
+                    bytes memory TIER_3_ = abi.encodePacked(TIER_3);
+                    _mint(_recipients[3][i], _tokenIds[3][i], 1, TIER_3_);
+                } else {
+                    // Fetch `recipient_` and add new `tieredToken`
+                    recipients[_recipients[3][i]].tieredTokens.push(
+                        tieredToken
+                    );
+
+                    // Mint token to recipient
+                    bytes memory TIER_3_ = abi.encodePacked(TIER_3);
+                    _mint(_recipients[3][i], _tokenIds[3][i], 1, TIER_3_);
+                }
             }
         }
     }
 
-    // todo: finish this function!!
-    function setTier(
-        address[] memory accounts,
-        uint256[] memory tokenIds,
-        bytes32[] memory tiers
-    ) internal {
-        if (accounts.length == 1) {
-            Tier memory tier = Tier(accounts[0], tokenIds[0], tiers[0]);
-
-            tiers[accounts[0]] = tier;
-        }
-        if (accounts.length > 1) {}
-    }
-
-    function getTier(address account, uint256 tokenId)
-        public
-        view
-        returns (TokenTier memory tokenTier)
-    {
+    function getTierByID(uint256 tokenId) public view returns (bytes32 tier) {
+        tier = tieredTokens[tokenId];
         return tier;
     }
 
-    // todo: finish this function!!
     // 7. Contract owner: Should be able to disable minting
-    function disableMint() public onlyRole(DEFAULT_ADMIN_ROLE) {}
+    function disableMint() public onlyRole(DEFAULT_ADMIN_ROLE) {
+        isMintingDisabled = true;
+    }
 
     // Function override required by Solidity.
     function _beforeTokenTransfer(
