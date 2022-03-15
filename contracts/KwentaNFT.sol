@@ -100,7 +100,7 @@ contract KwentaNFT is ERC1155, AccessControl, ERC1155Supply {
         }
     }
 
-    function getTokenIDTier(uint256 tokenId)
+    function getTierByTokenID(uint256 tokenId)
         public
         view
         returns (bytes32 tier)
