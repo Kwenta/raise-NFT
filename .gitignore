@@ -2,3 +2,20 @@
 
 .env
 .drawio.svg
+node_modules
+coverage
+coverage.json
+typechain
+
+# Hardhat files
+cache
+artifacts
+
+# dapptools stuff
+src
+lib
+.dapprc
+Makefile
+remappings.txt
+.gitmodules
+.gitattributes
