@@ -8,8 +8,11 @@ import "./KwentaNFT.sol";
 contract KwentaNFTTest is DSTest {
     KwentaNFT kwentaNFT;
 
+    string constant uri = "";
+    address[] recipients = ["", ""];
+
     function setUp() public {
-        kwentaNFT = new KwentaNFT();
+        kwentaNFT = new KwentaNFT(uri);
     }
 
     function testFail_basic_sanity() public {
@@ -19,4 +22,6 @@ contract KwentaNFTTest is DSTest {
     function test_basic_sanity() public {
         assertTrue(true);
     }
+
+    function testDistribute(address[] calldata _recipients) public {}
 }
