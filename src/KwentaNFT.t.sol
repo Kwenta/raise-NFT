@@ -9,12 +9,20 @@ contract KwentaNFTTest is DSTest {
     KwentaNFT kwentaNFT;
 
     string constant uri = "";
-    address[] recipients = ["", ""];
+    address[] to = ["", ""];
 
+    /*************
+     * Utilities *
+     ************/
     function setUp() public {
         kwentaNFT = new KwentaNFT(uri);
     }
 
+    function 
+
+    /****************
+     * Sanity tests *
+     ***************/
     function testFail_basic_sanity() public {
         assertTrue(false);
     }
@@ -23,5 +31,14 @@ contract KwentaNFTTest is DSTest {
         assertTrue(true);
     }
 
-    function testDistribute(address[] calldata _recipients) public {}
+    /******************
+     * Contract tests *
+     *****************/
+    function testDistribute(address[] calldata _to, uint256[] calldata _tiers)
+        public
+    {
+        kwentaNFT.distribute(_to, _tiers);
+
+        assertTrue(kwentaNFT.hasDistributed == true);
+    }
 }
