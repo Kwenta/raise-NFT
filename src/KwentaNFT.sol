@@ -7,23 +7,18 @@ import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 
 error HasDistributed(bool hasDistributed);
 error NotEnoughTiers(uint256 tiersLength);
+error MintIsDisabled(bool isMintingDisabled);
 error MisorderedTiers(
-    bytes32 tier0,
-    bytes32 tier1,
-    bytes32 tier2,
-    bytes32 tier3
-);
-error MintingIsDisabled(
-    address account,
-    uint256 id,
-    uint256 amount,
-    bytes data
+    uint256 tier0,
+    uint256 tier1,
+    uint256 tier2,
+    uint256 tier3
 );
 
 // 1. Should be one contract
 contract KwentaNFT is ERC1155, AccessControl, ERC1155Supply {
     event Distributed();
-    event MintingDisabled();
+    event MintDisabled();
 
     // Role state vars
     bytes32 public constant URI_SETTER_ROLE = keccak256("URI_SETTER_ROLE");
@@ -36,7 +31,7 @@ contract KwentaNFT is ERC1155, AccessControl, ERC1155Supply {
 
     // Other state vars
     bool hasDistributed;
-    bool isMintingDisabled;
+    bool isMintDisabled;
 
     constructor(string memory uri) ERC1155(uri) {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -64,31 +59,45 @@ contract KwentaNFT is ERC1155, AccessControl, ERC1155Supply {
      */
     function distribute(address[] calldata _to, uint256[] calldata _tiers)
         external
+        payable
         onlyRole(MINTER_ROLE)
     {
         if (!hasDistributed) revert HasDistributed(hasDistributed);
-        if (isMintingDisabled) revert MintingDisabled(isMintingDisabled);
+        if (isMintDisabled) revert MintIsDisabled(isMintDisabled);
         if (_tiers.length != 4) revert NotEnoughTiers(_tiers.length);
-        if (_tier[0] != 0 && _tier[1] != 1 && _tier[2] != 2 && _tier[3] != 3)
-            revert MisorderedTiers(_tiers[0], _tiers[1], _tiers[2], _tiers[3]);
+        if (
+            _tiers[0] != 0 && _tiers[1] != 1 && _tiers[2] != 2 && _tiers[3] != 3
+        ) revert MisorderedTiers(_tiers[0], _tiers[1], _tiers[2], _tiers[3]);
 
         //  4. Tiers should be stored in blocks of token ids (Tier 0: 1-100,
         //     Tier 1: 101-150, etc.)
-        for (uint256 tokenId = 1; tokenId < 207; tokenId++) {
-            if (tokenId < 101) mintByTier(_to[i], tier[0]);
-            if (tokenId > 100 && tokenId < 151) mintByTier(_to[i], tier[1]);
-            if (tokenId > 150 && tokenId < 201) mintByTier(_to[i], tier[2]);
-            if (tokenId > 200) mintByTier(_to[i], tier[3]);
+        for (uint256 i = 1; i < 207; i++) {
+            if (i < 101) mintByTier(_to[i], _tiers[0]);
+            if (i > 100 && i < 151) mintByTier(_to[i], _tiers[1]);
+            if (i > 150 && i < 201) mintByTier(_to[i], _tiers[2]);
+            if (i > 200) mintByTier(_to[i], _tiers[3]);
         }
 
         hasDistributed = true;
     }
 
-    function mintByTier(address _to, uint256 tier) internal payable {
-        if (tier == 0) _mint(_to, 0, 1, TIER_0);
-        if (tier == 1) _mint(_to, 1, 1, TIER_1);
-        if (tier == 2) _mint(_to, 2, 1, TIER_2);
-        if (tier == 3) _mint(_to, 3, 1, TIER_3);
+    function mintByTier(address _to, uint256 _tier) internal {
+        if (_tier == 0) {
+            bytes memory tier = abi.encodePacked(_tier);
+            _mint(_to, _tier, 1, tier);
+        }
+        if (_tier == 1) {
+            bytes memory tier = abi.encodePacked(_tier);
+            _mint(_to, _tier, 1, tier);
+        }
+        if (_tier == 2) {
+            bytes memory tier = abi.encodePacked(_tier);
+            _mint(_to, _tier, 1, tier);
+        }
+        if (_tier == 3) {
+            bytes memory tier = abi.encodePacked(_tier);
+            _mint(_to, _tier, 1, tier);
+        }
     }
 
     function getTokenIDTier(uint256 tokenId)
@@ -104,7 +113,7 @@ contract KwentaNFT is ERC1155, AccessControl, ERC1155Supply {
 
     // 7. Contract owner: Should be able to disable minting
     function disableMint() external onlyRole(MINTER_ROLE) {
-        isMintingDisabled = true;
+        isMintDisabled = true;
     }
 
     // Function override required by Solidity.
