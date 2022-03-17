@@ -17,7 +17,6 @@ describe(`KwentaNFT (on Optimism)`, () => {
   const infuraRinkebyUrl = 'https://rinkeby.infura.io/v3/'
 
   let receipt: ContractReceipt,
-    mintTx0: ContractTransaction,
     KwentaNFT: KwentaNFT,
     deployedCtc,
     provider = new ethers.providers.JsonRpcProvider(
@@ -49,13 +48,10 @@ describe(`KwentaNFT (on Optimism)`, () => {
       KwentaNFT.deployed()
 
       console.log(`\n KwentaNFT contract address: ${KwentaNFT.address} \n`)
-      // receipt = await mintTx0.wait()
 
       deployedCtc = await KwentaNFT.deployTransaction.wait()
 
-      console.log(
-        `\n Gas used to deploy: ${deployedCtc.gasUsed.toString()} gas \n`
-      )
+      console.log(`Gas used to deploy: ${deployedCtc.gasUsed.toString()} gas \n`)
     })
 
     // it(`should get the uri for tier0 tokenIds`, async () => {
@@ -97,16 +93,15 @@ describe(`KwentaNFT (on Optimism)`, () => {
     // })
 
     it(`should have distributed`, async () => {
-      let _to: any = []
+      let _to: string[] = []
 
       l2Wallets.forEach((l2Wallet: Wallet) => {
         _to.push(l2Wallet.address)
       })
 
-      console.log('Length of recipient addresses: ', _to.length)
-
-      const distributeTx = await KwentaNFT.connect(owner).distribute(_to)
+      const distributeTx = await KwentaNFT.connect(owner).distribute(_to.slice(0, 101))
       const distributeTxReceipt = await distributeTx.wait()
+      
       const hasDistributed_ = await KwentaNFT.hasDistributed()
       console.log(`\n hasDistributed bool state var: ${hasDistributed_} \n`)
 
@@ -117,18 +112,18 @@ describe(`KwentaNFT (on Optimism)`, () => {
       for (let tokenId = 0; tokenId < _to.length; tokenId++) {
         // 2a. Confirm that tokens were distributed by tier
         const tier0 = tokenId < 101
-        const tier1 = tokenId > 100 && tokenId < 151
-        const tier2 = tokenId > 150 && tokenId < 201
-        const tier3 = tokenId > 200 && tokenId < 207
+        // const tier1 = tokenId > 100 && tokenId < 151
+        // const tier2 = tokenId > 150 && tokenId < 201
+        // const tier3 = tokenId > 200 && tokenId < 207
 
         let balance
 
-        if (tier0) balance = await KwentaNFT.balanceOf(_to, 0)
-        if (tier1) balance = await KwentaNFT.balanceOf(_to, 1)
-        if (tier2) balance = await KwentaNFT.balanceOf(_to, 2)
-        if (tier3) balance = await KwentaNFT.balanceOf(_to, 3)
+        if (tier0) balance = await KwentaNFT.balanceOf(_to[tokenId], 0)
+        // if (tier1) balance = await KwentaNFT.balanceOf(_to[tokenId], 1)
+        // if (tier2) balance = await KwentaNFT.balanceOf(_to[tokenId], 2)
+        // if (tier3) balance = await KwentaNFT.balanceOf(_to[tokenId], 3)
 
-        if (balance) expect(balance.toNumber()).to.eq(1)
+        if (balance !== undefined) expect(balance.toNumber()).to.eq(1)
       }
     })
 

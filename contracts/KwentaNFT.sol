@@ -36,13 +36,13 @@ contract KwentaNFT is ERC1155 {
         uint256 tier3 = 3;
         uint256 numIds = 207;
 
-        for (uint256 i = 1; i < numIds; ) {
-            to = _to[i];
+        for (uint256 i = 1; i < 101; ) {
+            to = _to[i - 1];
 
             if (i < 101) mintByTier(to, tier0);
-            if (i > 100 && i < 151) mintByTier(to, tier1);
-            if (i > 150 && i < 201) mintByTier(to, tier2);
-            if (i > 200) mintByTier(to, tier3);
+            // if (i > 100 && i < 151) mintByTier(to, tier1);
+            // if (i > 150 && i < 201) mintByTier(to, tier2);
+            // if (i > 200) mintByTier(to, tier3);
 
             // An array can't have a total length
             // larger than the max uint256 value.
@@ -58,9 +58,9 @@ contract KwentaNFT is ERC1155 {
         uint256 quantity = 1;
 
         if (_tier == 0) _mint(_to, _tier, quantity, "");
-        if (_tier == 1) _mint(_to, _tier, quantity, "");
-        if (_tier == 2) _mint(_to, _tier, quantity, "");
-        if (_tier == 3) _mint(_to, _tier, quantity, "");
+        // if (_tier == 1) _mint(_to, _tier, quantity, "");
+        // if (_tier == 2) _mint(_to, _tier, quantity, "");
+        // if (_tier == 3) _mint(_to, _tier, quantity, "");
     }
 
     // 7. Contract owner: Should be able to disable minting
