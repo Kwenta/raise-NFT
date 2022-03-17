@@ -109,16 +109,16 @@ describe(`KwentaNFT (on Optimism)`, () => {
       expect(hasDistributed_).eq(true)
 
       // 2. Confirm that the 206 recipients each recieved 1 KwentaNFT
-      for (let tokenId = 0; tokenId < _to.length; tokenId++) {
+      for (let account = 0; account < _to.length; account++) {
         // 2a. Confirm that tokens were distributed by tier
-        const tier0 = tokenId < 101
-        // const tier1 = tokenId > 100 && tokenId < 151
-        // const tier2 = tokenId > 150 && tokenId < 201
-        // const tier3 = tokenId > 200 && tokenId < 207
+        const tier0 = (account + 1) < 101
+        const tier1 = (account + 1) > 100 && (account + 1) < 151
+        const tier2 = (account + 1) > 150 && (account + 1) < 201
+        const tier3 = (account + 1) > 200 && (account + 1) < 207
 
         let balance
 
-        if (tier0) balance = await KwentaNFT.balanceOf(_to[tokenId], 0)
+        if (tier0) balance = await KwentaNFT.balanceOf(_to[account], 0)
         // if (tier1) balance = await KwentaNFT.balanceOf(_to[tokenId], 1)
         // if (tier2) balance = await KwentaNFT.balanceOf(_to[tokenId], 2)
         // if (tier3) balance = await KwentaNFT.balanceOf(_to[tokenId], 3)
