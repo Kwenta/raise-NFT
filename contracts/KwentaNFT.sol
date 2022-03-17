@@ -6,7 +6,7 @@ import "./ERC1155.sol";
 error CallerIsNotOwner(address owner);
 error HasDistributed(bool hasDistributed);
 error NotEnoughTiers(uint256 tiersLength);
-error TokenIdIdOutOfRange(uint256 tokenId);
+error TokenIdOutOfRange(uint256 tokenId);
 error MintIsDisabled(bool isMintingDisabled);
 
 // 1. Should be one contract

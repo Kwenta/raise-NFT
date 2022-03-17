@@ -38,6 +38,11 @@ describe(`KwentaNFT (on Optimism)`, () => {
         l2Wallets.push(l2Wallet)
       }
 
+
+      l2Wallets.forEach((l2Wallet: Wallet) => {
+        console.log('L2Wallet addresss: ', l2Wallet.address)
+      })
+
       // Create owner account
       /**
        * @todo ADD YOUR PRIVATE KEY TO TEST WITH
