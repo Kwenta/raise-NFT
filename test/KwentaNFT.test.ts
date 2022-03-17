@@ -58,87 +58,85 @@ describe(`KwentaNFT (on Optimism)`, () => {
       )
     })
 
-    it(`should get the uri for tier0 tokenIds`, async () => {
-      for (let tokenId = 1; tokenId < 101; tokenId++) {
-        let uri_ = await KwentaNFT.connect(owner).uri(tokenId)
-        if (tokenId < 101) expect(uri_).to.eq(uri + 'tier0.json')
-      }
-    })
+    // it(`should get the uri for tier0 tokenIds`, async () => {
+    //   for (let tokenId = 1; tokenId < 101; tokenId++) {
+    //     let uri_ = await KwentaNFT.connect(owner).uri(tokenId)
+    //     if (tokenId < 101) expect(uri_).to.eq(uri + 'tier0.json')
+    //   }
+    // })
 
-    it(`should get the uri for tier1 tokenIds`, async () => {
-      for (let tokenId = 101; tokenId < 151; tokenId++) {
-        let uri_ = await KwentaNFT.connect(owner).uri(tokenId)
-        if (tokenId > 100 && tokenId < 151) expect(uri_).to.eq(uri + 'tier1.json')
-      }
-    })
+    // it(`should get the uri for tier1 tokenIds`, async () => {
+    //   for (let tokenId = 101; tokenId < 151; tokenId++) {
+    //     let uri_ = await KwentaNFT.connect(owner).uri(tokenId)
+    //     if (tokenId > 100 && tokenId < 151) expect(uri_).to.eq(uri + 'tier1.json')
+    //   }
+    // })
 
-    it(`should get the uri for tier2 tokenIds`, async () => {
-      for (let tokenId = 151; tokenId < 201; tokenId++) {
-        let uri_ = await KwentaNFT.connect(owner).uri(tokenId)
-        if (tokenId > 150 && tokenId < 201) expect(uri_).to.eq(uri + 'tier2.json')
-      }
-    })
+    // it(`should get the uri for tier2 tokenIds`, async () => {
+    //   for (let tokenId = 151; tokenId < 201; tokenId++) {
+    //     let uri_ = await KwentaNFT.connect(owner).uri(tokenId)
+    //     if (tokenId > 150 && tokenId < 201) expect(uri_).to.eq(uri + 'tier2.json')
+    //   }
+    // })
 
-    it(`should get the uri for tier3 tokenIds`, async () => {
-      for (let tokenId = 201; tokenId < 207; tokenId++) {
-        let uri_ = await KwentaNFT.connect(owner).uri(tokenId)
-        if (tokenId > 200 && tokenId < 207) expect(uri_).to.eq(uri + 'tier3.json')
-      }
-    })
+    // it(`should get the uri for tier3 tokenIds`, async () => {
+    //   for (let tokenId = 201; tokenId < 207; tokenId++) {
+    //     let uri_ = await KwentaNFT.connect(owner).uri(tokenId)
+    //     if (tokenId > 200 && tokenId < 207) expect(uri_).to.eq(uri + 'tier3.json')
+    //   }
+    // })
 
-    it(`should get the uri for outOfRange tokenIds`, async () => {
-      let uri_
+    // it(`should get the uri for outOfRange tokenIds`, async () => {
+    //   let uri_
 
-      for (let tokenId = 206; tokenId < 210; tokenId++) {
-        uri_ = await KwentaNFT.connect(owner).uri(tokenId)
+    //   for (let tokenId = 206; tokenId < 210; tokenId++) {
+    //     uri_ = await KwentaNFT.connect(owner).uri(tokenId)
 
-        if (tokenId > 206) console.log('Should return outOfRange error: ', uri_)
-      }
-    })
+    //     if (tokenId > 206) console.log('Should return outOfRange error: ', uri_)
+    //   }
+    // })
 
     it(`should have distributed`, async () => {
-      let _to: any = [],
-        distributeTx
+      let _to: any = []
 
       l2Wallets.forEach((l2Wallet: Wallet) => {
         _to.push(l2Wallet.address)
       })
 
-      distributeTx = await KwentaNFT.connect(owner).distribute(_to)
+      console.log('Length of recipient addresses: ', _to.length)
 
+      const distributeTx = await KwentaNFT.connect(owner).distribute(_to)
+      const distributeTxReceipt = await distributeTx.wait()
       const hasDistributed_ = await KwentaNFT.hasDistributed()
       console.log(`\n hasDistributed bool state var: ${hasDistributed_} \n`)
 
       // 1. Confirm that the `hasDistributed` state var has changed
       expect(hasDistributed_).eq(true)
 
-      // // 2. Confirm that the 206 recipients each recieved 1 KwentaNFT
-      // for (let tokenId = 0; tokenId < _to.length; tokenId++) {
-      //   // 2a. Confirm that tokens were distributed by tier
-      //   const tier0 = tokenId < 101
-      //   const tier1 = tokenId > 100 && tokenId < 151
-      //   const tier2 = tokenId > 150 && tokenId < 201
-      //   const tier3 = tokenId > 200 && tokenId < 207
-      //   const outOfRange = tokenId > 206
+      // 2. Confirm that the 206 recipients each recieved 1 KwentaNFT
+      for (let tokenId = 0; tokenId < _to.length; tokenId++) {
+        // 2a. Confirm that tokens were distributed by tier
+        const tier0 = tokenId < 101
+        const tier1 = tokenId > 100 && tokenId < 151
+        const tier2 = tokenId > 150 && tokenId < 201
+        const tier3 = tokenId > 200 && tokenId < 207
 
-      //   let balance
+        let balance
 
-      //   if (tier0) balance = await KwentaNFT.balanceOf(_to, 0)
-      //   if (tier1) balance = await KwentaNFT.balanceOf(_to, 1)
-      //   if (tier2) balance = await KwentaNFT.balanceOf(_to, 2)
-      //   if (tier3) balance = await KwentaNFT.balanceOf(_to, 3)
+        if (tier0) balance = await KwentaNFT.balanceOf(_to, 0)
+        if (tier1) balance = await KwentaNFT.balanceOf(_to, 1)
+        if (tier2) balance = await KwentaNFT.balanceOf(_to, 2)
+        if (tier3) balance = await KwentaNFT.balanceOf(_to, 3)
 
-      //   if (outOfRange) console.log('This should result in an error!')
-
-      //   if (balance) expect(balance.toNumber()).to.eq(1)
-      // }
+        if (balance) expect(balance.toNumber()).to.eq(1)
+      }
     })
 
     describe(`disableMint(...)`, () => {
       it(`should disable minting `, async () => {
-        await KwentaNFT.connect(owner).disableMint()
+        const disableMintTx = await KwentaNFT.connect(owner).disableMint()
+        const disableMintTxReceipt = await disableMintTx.wait()
         const isMintDisabled = await KwentaNFT.connect(owner).isMintDisabled()
-
         expect(isMintDisabled).to.eq(true)
       })
     })
