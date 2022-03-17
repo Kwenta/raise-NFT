@@ -1,6 +1,7 @@
 /out
 
 .env
+./recipientPrivateKeys.json
 .drawio.svg
 node_modules
 coverage

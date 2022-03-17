@@ -3,16 +3,14 @@ pragma solidity ^0.8.10;
 
 import "./ERC1155.sol";
 
+error CallerIsNotOwner(address owner);
 error HasDistributed(bool hasDistributed);
 error NotEnoughTiers(uint256 tiersLength);
+error TokenIdIdOutOfRange(uint256 tokenId);
 error MintIsDisabled(bool isMintingDisabled);
-error CallerIsNotOwner(address owner);
 
 // 1. Should be one contract
 contract KwentaNFT is ERC1155 {
-    event Distributed();
-    event MintDisabled();
-
     // state vars
     address public owner;
     bool public hasDistributed;
@@ -41,12 +39,12 @@ contract KwentaNFT is ERC1155 {
         if (hasDistributed) revert HasDistributed(hasDistributed);
         if (isMintDisabled) revert MintIsDisabled(isMintDisabled);
 
-        uint256 numIds = 207;
         address to;
         uint256 tier0 = 0;
         uint256 tier1 = 1;
         uint256 tier2 = 2;
         uint256 tier3 = 3;
+        uint256 numIds = 207;
 
         for (uint256 i = 1; i < numIds; ) {
             to = _to[i];
@@ -79,7 +77,8 @@ contract KwentaNFT is ERC1155 {
         if (tokenId < 101) return 0;
         if (tokenId > 100 && tokenId < 151) return 1;
         if (tokenId > 150 && tokenId < 201) return 2;
-        if (tokenId > 200) return 3;
+        if (tokenId > 200 && tokenId < 207) return 3;
+        if (tokenId > 206) revert TokenIdOutOfRange(tokenId);
     }
 
     // 7. Contract owner: Should be able to disable minting
