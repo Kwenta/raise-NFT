@@ -63,14 +63,6 @@ contract KwentaNFT is ERC1155 {
         if (_tier == 3) _mint(_to, _tier, quantity, "");
     }
 
-    function getTierByTokenID(uint256 tokenId) public pure returns (uint256) {
-        if (tokenId < 101) return 0;
-        if (tokenId > 100 && tokenId < 151) return 1;
-        if (tokenId > 150 && tokenId < 201) return 2;
-        if (tokenId > 200 && tokenId < 207) return 3;
-        if (tokenId > 206) revert TokenIdOutOfRange(tokenId);
-    }
-
     // 7. Contract owner: Should be able to disable minting
     function disableMint() public {
         if (msg.sender != owner) revert CallerIsNotOwner(owner);

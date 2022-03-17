@@ -134,20 +134,6 @@ describe(`KwentaNFT (on Optimism)`, () => {
       // }
     })
 
-    describe(`getTokenIDByTier(...)`, () => {
-      it(`should get tier `, async () => {
-        const tier0 = await KwentaNFT.connect(owner).getTierByTokenID(1)
-        const tier1 = await KwentaNFT.connect(owner).getTierByTokenID(101)
-        const tier2 = await KwentaNFT.connect(owner).getTierByTokenID(151)
-        const tier3 = await KwentaNFT.connect(owner).getTierByTokenID(201)
-
-        expect(tier0.toNumber()).to.eq(0)
-        expect(tier1.toNumber()).to.eq(1)
-        expect(tier2.toNumber()).to.eq(2)
-        expect(tier3.toNumber()).to.eq(3)
-      })
-    })
-
     describe(`disableMint(...)`, () => {
       it(`should disable minting `, async () => {
         await KwentaNFT.connect(owner).disableMint()
