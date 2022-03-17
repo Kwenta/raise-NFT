@@ -1,9 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity >=0.8.0;
 
+import "@openzeppelin/contracts/utils/Strings.sol";
+
+error NonExistentTier(uint256 tokenId);
+
 /// @notice Minimalist and gas efficient standard ERC1155 implementation.
 /// @author Solmate (https://github.com/Rari-Capital/solmate/blob/main/src/tokens/ERC1155.sol)
 contract ERC1155 {
+    using Strings for uint256;
+
     /*///////////////////////////////////////////////////////////////
                                 EVENTS
     //////////////////////////////////////////////////////////////*/
@@ -41,21 +47,45 @@ contract ERC1155 {
     mapping(address => mapping(address => bool)) public isApprovedForAll;
 
     // Used as the URI for all token types by relying on ID substitution, e.g. https://token-cdn-domain/{id}.json
-    string private _uri;
+    string private baseURI;
 
     /*///////////////////////////////////////////////////////////////
                             CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
     constructor(string memory uri_) {
-        _uri = uri_;
+        baseURI = uri_;
     }
 
     /*///////////////////////////////////////////////////////////////
                              METADATA LOGIC
     //////////////////////////////////////////////////////////////*/
 
-    function uri(uint256) public view virtual returns (string memory) {
-        return _uri;
+    function uri(uint256 tokenId) public view virtual returns (string memory) {
+        if (tokenId < 101) {
+            return
+                bytes(baseURI).length > 0
+                    ? string(abi.encodePacked(baseURI, "tier0.json"))
+                    : "";
+        }
+        if (tokenId > 100 && tokenId < 151) {
+            return
+                bytes(baseURI).length > 0
+                    ? string(abi.encodePacked(baseURI, "tier1.json"))
+                    : "";
+        }
+        if (tokenId > 150 && tokenId < 201) {
+            return
+                bytes(baseURI).length > 0
+                    ? string(abi.encodePacked(baseURI, "tier2.json"))
+                    : "";
+        }
+        if (tokenId > 200 && tokenId < 207) {
+            return
+                bytes(baseURI).length > 0
+                    ? string(abi.encodePacked(baseURI, "tier3.json"))
+                    : "";
+        }
+        if (tokenId > 206) revert NonExistentTier(tokenId);
     }
 
     /*///////////////////////////////////////////////////////////////

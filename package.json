@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "clean": "rm -rf artifacts",
+    "clean": "rm -rf artifacts cache",
     "compile": "npx hardhat compile",
     "test": "npx hardhat test --network hardhat ./test/KwentaNFT.test.ts",
     "test:kovan": "npx hardhat test --network kovan ./test/KwentaNFT.test.ts"

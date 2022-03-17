@@ -20,16 +20,6 @@ contract KwentaNFT is ERC1155 {
         owner = msg.sender;
     }
 
-    // 8. There should not be a public mint function
-    function mint(
-        address account,
-        uint256 id,
-        uint256 amount,
-        bytes memory data
-    ) internal {
-        _mint(account, id, amount, data);
-    }
-
     /**
      * 6. Should be allowed to do a one-time distribution, full control over
      *  minting function.
@@ -82,7 +72,7 @@ contract KwentaNFT is ERC1155 {
     }
 
     // 7. Contract owner: Should be able to disable minting
-    function disableMint() external {
+    function disableMint() public {
         if (msg.sender != owner) revert CallerIsNotOwner(owner);
         isMintDisabled = true;
     }
