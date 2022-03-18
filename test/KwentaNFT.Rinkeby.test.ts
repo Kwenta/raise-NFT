@@ -60,8 +60,8 @@ describe(`KwentaNFT (Rinkeby)`, () => {
     })
 
     /**
-       * @dev 4/5 PASS and 1 FAIL
-       */
+     * @dev 4/5 PASS and 1 FAIL
+     */
     describe(`uri(uint256 tokenId)`, () => {
       it(`should get the uri for tier0 tokenIds`, async () => {
         for (let tokenId = 1; tokenId < 101; tokenId++) {

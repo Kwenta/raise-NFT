@@ -13,7 +13,7 @@ contract KwentaNFT is ERC1155 {
     using Strings for uint256;
 
     // public state vars
-    address public owner;
+    address public immutable owner;
     bool public hasDistributed;
     bool public isMintDisabled;
     // private state vars
