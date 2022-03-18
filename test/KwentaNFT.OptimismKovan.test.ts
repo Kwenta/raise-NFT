@@ -60,43 +60,43 @@ describe(`KwentaNFT (Optimism Kovan)`, () => {
     })
 
     describe(`uri(uint256 tokenId)`, () => {
-      // it(`should get the uri for tier0 tokenIds`, async () => {
-      //   for (let tokenId = 1; tokenId < 101; tokenId++) {
-      //     let uri_ = await KwentaNFT.connect(owner).uri(tokenId)
-      //     if (tokenId < 101) expect(uri_).to.eq(uri + '0.json')
-      //   }
-      // })
+      it(`should get the uri for tier0 tokenIds`, async () => {
+        for (let tokenId = 1; tokenId < 101; tokenId++) {
+          const uri_ = await KwentaNFT.connect(owner).uri(tokenId)
+          if (tokenId < 101) expect(uri_).to.eq(uri + '0.json')
+        }
+      })
 
-      // it(`should get the uri for tier1 tokenIds`, async () => {
-      //   for (let tokenId = 101; tokenId < 151; tokenId++) {
-      //     let uri_ = await KwentaNFT.connect(owner).uri(tokenId)
-      //     if (tokenId > 100 && tokenId < 151) expect(uri_).to.eq(uri + '1.json')
-      //   }
-      // })
+      it(`should get the uri for tier1 tokenIds`, async () => {
+        for (let tokenId = 101; tokenId < 151; tokenId++) {
+          const uri_ = await KwentaNFT.connect(owner).uri(tokenId)
+          if (tokenId > 100 && tokenId < 151) expect(uri_).to.eq(uri + '1.json')
+        }
+      })
 
-      // it(`should get the uri for tier2 tokenIds`, async () => {
-      //   for (let tokenId = 151; tokenId < 201; tokenId++) {
-      //     let uri_ = await KwentaNFT.connect(owner).uri(tokenId)
-      //     if (tokenId > 150 && tokenId < 201) expect(uri_).to.eq(uri + '2.json')
-      //   }
-      // })
+      it(`should get the uri for tier2 tokenIds`, async () => {
+        for (let tokenId = 151; tokenId < 201; tokenId++) {
+          const uri_ = await KwentaNFT.connect(owner).uri(tokenId)
+          if (tokenId > 150 && tokenId < 201) expect(uri_).to.eq(uri + '2.json')
+        }
+      })
 
       it(`should get the uri for tier3 tokenIds`, async () => {
         for (let tokenId = 201; tokenId < 207; tokenId++) {
-          let uri_ = await KwentaNFT.connect(owner).uri(tokenId)
+          const uri_ = await KwentaNFT.connect(owner).uri(tokenId)
           if (tokenId > 200 && tokenId < 207) expect(uri_).to.eq(uri + '3.json')
         }
       })
 
-      // it(`should get the uri for outOfRange tokenIds`, async () => {
-      //   let uri_
-
-      //   for (let tokenId = 206; tokenId < 210; tokenId++) {
-      //     uri_ = await KwentaNFT.connect(owner).uri(tokenId)
-
-      //     if (tokenId > 206) console.log('Should return outOfRange error: ', uri_)
-      //   }
-      // })
+      /**
+       * @todo Extract error and use in `expect()` call
+       */
+      it(`should get the uri for outOfRange tokenIds`, async () => {
+        for (let tokenId = 206; tokenId < 210; tokenId++) {
+          const uri_ = await KwentaNFT.connect(owner).uri(tokenId)
+          if (tokenId > 206) console.log('Should return outOfRange error: ', uri_)
+        }
+      })
     })
 
     describe(`distribute(address[] _to)`, () => {
@@ -104,44 +104,41 @@ describe(`KwentaNFT (Optimism Kovan)`, () => {
         it(`should have flipped 'hasDistributed' to 'true'`, async () => {
           const distributeTx = await KwentaNFT.connect(owner).distribute(_to)
           await distributeTx.wait()
-
           const hasDistributed_ = await KwentaNFT.hasDistributed()
-          console.log(`\n hasDistributed bool state var: ${hasDistributed_} \n`)
-
           expect(hasDistributed_).eq(true)
         })
 
         it(`should have gave each tier 0 recipient 1 KwentaNFT`, async () => {
           for (let account = 0; account < 100; account++) {
-            let balance = await KwentaNFT.balanceOf(_to[account], 0)
+            const balance = await KwentaNFT.balanceOf(_to[account], 0)
             expect(balance.toNumber()).to.eq(1)
           }
         })
 
         it(`should have gave each tier 0 recipient 1 tier 0 KwentaNFT`, async () => {
           for (let account = 0; account < 100; account++) {
-            let balance = await KwentaNFT.balanceOf(_to[account], 0)
+            const balance = await KwentaNFT.balanceOf(_to[account], 0)
             expect(balance.toNumber()).to.eq(1)
           }
         })
 
         it(`should have gave each tier 1 recipient 1 tier 1 KwentaNFT`, async () => {
           for (let account = 100; account < 150; account++) {
-            let balance = await KwentaNFT.balanceOf(_to[account], 1)
+            const balance = await KwentaNFT.balanceOf(_to[account], 1)
             expect(balance.toNumber()).to.eq(1)
           }
         })
 
         it(`should have gave each tier 2 recipient 1 tier 2 KwentaNFT`, async () => {
           for (let account = 150; account < 200; account++) {
-            let balance = await KwentaNFT.balanceOf(_to[account], 2)
+            const balance = await KwentaNFT.balanceOf(_to[account], 2)
             expect(balance.toNumber()).to.eq(1)
           }
         })
 
         it(`should have gave each tier 3 recipient 1 tier 3 KwentaNFT`, async () => {
           for (let account = 200; account < 206; account++) {
-            let balance = await KwentaNFT.balanceOf(_to[account], 3)
+            const balance = await KwentaNFT.balanceOf(_to[account], 3)
             expect(balance.toNumber()).to.eq(1)
           }
         })
@@ -150,9 +147,9 @@ describe(`KwentaNFT (Optimism Kovan)`, () => {
       describe(`should nots`, () => {
         it(`should not have gave each tier 0 recipient any tier 1, 2, nor 3 KwentaNFTs`, async () => {
           for (let account = 0; account < 100; account++) {
-            let balance1 = await KwentaNFT.balanceOf(_to[account], 1),
-              balance2 = await KwentaNFT.balanceOf(_to[account], 2),
-              balance3 = await KwentaNFT.balanceOf(_to[account], 3)
+            const balance1 = await KwentaNFT.balanceOf(_to[account], 1)
+            const balance2 = await KwentaNFT.balanceOf(_to[account], 2)
+            const balance3 = await KwentaNFT.balanceOf(_to[account], 3)
 
             expect(balance1.toNumber()).to.eq(0)
             expect(balance2.toNumber()).to.eq(0)
@@ -160,11 +157,11 @@ describe(`KwentaNFT (Optimism Kovan)`, () => {
           }
         })
 
-        it(`should have gave each tier 1 recipient any tier 0, 2, nor 3 KwentaNFTs`, async () => {
+        it(`should not have gave each tier 1 recipient any tier 0, 2, nor 3 KwentaNFTs`, async () => {
           for (let account = 100; account < 150; account++) {
-            let balance0 = await KwentaNFT.balanceOf(_to[account], 0),
-              balance2 = await KwentaNFT.balanceOf(_to[account], 2),
-              balance3 = await KwentaNFT.balanceOf(_to[account], 3)
+            const balance0 = await KwentaNFT.balanceOf(_to[account], 0)
+            const balance2 = await KwentaNFT.balanceOf(_to[account], 2)
+            const balance3 = await KwentaNFT.balanceOf(_to[account], 3)
 
             expect(balance0.toNumber()).to.eq(0)
             expect(balance2.toNumber()).to.eq(0)
@@ -172,11 +169,11 @@ describe(`KwentaNFT (Optimism Kovan)`, () => {
           }
         })
 
-        it(`should have gave each tier 2 recipient any tier 0, 1, nor 3 KwentaNFTs`, async () => {
+        it(`should not have gave each tier 2 recipient any tier 0, 1, nor 3 KwentaNFTs`, async () => {
           for (let account = 150; account < 200; account++) {
-            let balance0 = await KwentaNFT.balanceOf(_to[account], 0),
-              balance1 = await KwentaNFT.balanceOf(_to[account], 1),
-              balance3 = await KwentaNFT.balanceOf(_to[account], 3)
+            const balance0 = await KwentaNFT.balanceOf(_to[account], 0)
+            const balance1 = await KwentaNFT.balanceOf(_to[account], 1)
+            const balance3 = await KwentaNFT.balanceOf(_to[account], 3)
 
             expect(balance0.toNumber()).to.eq(0)
             expect(balance1.toNumber()).to.eq(0)
@@ -184,11 +181,11 @@ describe(`KwentaNFT (Optimism Kovan)`, () => {
           }
         })
 
-        it(`should have gave each tier 3 recipient any tier 0, 1, nor 2 KwentaNFTs`, async () => {
+        it(`should not have gave each tier 3 recipient any tier 0, 1, nor 2 KwentaNFTs`, async () => {
           for (let account = 200; account < 206; account++) {
-            let balance0 = await KwentaNFT.balanceOf(_to[account], 0),
-              balance1 = await KwentaNFT.balanceOf(_to[account], 1),
-              balance2 = await KwentaNFT.balanceOf(_to[account], 2)
+            const balance0 = await KwentaNFT.balanceOf(_to[account], 0)
+            const balance1 = await KwentaNFT.balanceOf(_to[account], 1)
+            const balance2 = await KwentaNFT.balanceOf(_to[account], 2)
 
             expect(balance0.toNumber()).to.eq(0)
             expect(balance1.toNumber()).to.eq(0)
@@ -199,6 +196,9 @@ describe(`KwentaNFT (Optimism Kovan)`, () => {
     })
 
     describe(`disableMint()`, () => {
+      /**
+       * @todo Extract error and use in `expect()` call
+       */
       it(`should revert if not owner `, async () => {
         const disableMintTx = await KwentaNFT.connect(
           _to[_to.length - 1]
