@@ -66,28 +66,28 @@ describe(`KwentaNFT (Rinkeby)`, () => {
       it(`should get the uri for tier0 tokenIds`, async () => {
         for (let tokenId = 1; tokenId < 101; tokenId++) {
           const uri_ = await KwentaNFT.connect(owner).uri(tokenId)
-          if (tokenId < 101) expect(uri_).to.eq(uri + '0.json')
+          expect(uri_).to.eq(uri + '0.json')
         }
       })
 
       it(`should get the uri for tier1 tokenIds`, async () => {
         for (let tokenId = 101; tokenId < 151; tokenId++) {
           const uri_ = await KwentaNFT.connect(owner).uri(tokenId)
-          if (tokenId > 100 && tokenId < 151) expect(uri_).to.eq(uri + '1.json')
+          expect(uri_).to.eq(uri + '1.json')
         }
       })
 
       it(`should get the uri for tier2 tokenIds`, async () => {
         for (let tokenId = 151; tokenId < 201; tokenId++) {
           const uri_ = await KwentaNFT.connect(owner).uri(tokenId)
-          if (tokenId > 150 && tokenId < 201) expect(uri_).to.eq(uri + '2.json')
+          expect(uri_).to.eq(uri + '2.json')
         }
       })
 
       it(`should get the uri for tier3 tokenIds`, async () => {
         for (let tokenId = 201; tokenId < 207; tokenId++) {
           const uri_ = await KwentaNFT.connect(owner).uri(tokenId)
-          if (tokenId > 200 && tokenId < 207) expect(uri_).to.eq(uri + '3.json')
+          expect(uri_).to.eq(uri + '3.json')
         }
       })
 
@@ -96,8 +96,8 @@ describe(`KwentaNFT (Rinkeby)`, () => {
        */
       it(`should get the uri for outOfRange tokenIds`, async () => {
         for (let tokenId = 206; tokenId < 210; tokenId++) {
-          const uri_ = await KwentaNFT.connect(owner).uri(tokenId)
-          if (tokenId > 206) console.log('Should return outOfRange error: ', uri_)
+          const uri_ = KwentaNFT.connect(owner).uri(tokenId)
+          await expect(uri_).to.be.revertedWith('TokenIdOutOfRange')
         }
       })
     })
@@ -208,16 +208,13 @@ describe(`KwentaNFT (Rinkeby)`, () => {
        * @todo Extract error and use in `expect()` call
        */
       it(`should revert if not owner `, async () => {
-        const disableMintTx = await KwentaNFT.connect(
-          _to[_to.length - 1]
-        ).disableMint()
-        const isMintDisabled = await KwentaNFT.connect(owner).isMintDisabled()
-        expect(isMintDisabled).to.eq(true)
+        const disableMintTx = KwentaNFT.connect(_to[2]).disableMint()
+        await expect(disableMintTx).to.be.revertedWith('CallerIsNotOwner')
       })
 
       it(`should disable minting `, async () => {
         const disableMintTx = await KwentaNFT.connect(owner).disableMint()
-        const disableMintTxReceipt = await disableMintTx.wait()
+        await disableMintTx.wait()
         const isMintDisabled = await KwentaNFT.connect(owner).isMintDisabled()
         expect(isMintDisabled).to.eq(true)
       })
