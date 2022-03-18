@@ -59,6 +59,9 @@ describe(`KwentaNFT (Optimism Kovan)`, () => {
       console.log(`Gas used to deploy: ${deployedCtc.gasUsed.toString()} gas \n`)
     })
 
+    /**
+       * @dev 4/5 PASS and 1 FAIL
+       */
     describe(`uri(uint256 tokenId)`, () => {
       it(`should get the uri for tier0 tokenIds`, async () => {
         for (let tokenId = 1; tokenId < 101; tokenId++) {
@@ -100,6 +103,9 @@ describe(`KwentaNFT (Optimism Kovan)`, () => {
     })
 
     describe(`distribute(address[] _to)`, () => {
+      /**
+       * @dev 5/5 PASS
+       */
       describe(`shoulds`, () => {
         it(`should have flipped 'hasDistributed' to 'true'`, async () => {
           const distributeTx = await KwentaNFT.connect(owner).distribute(_to)
@@ -109,13 +115,6 @@ describe(`KwentaNFT (Optimism Kovan)`, () => {
         })
 
         it(`should have gave each tier 0 recipient 1 KwentaNFT`, async () => {
-          for (let account = 0; account < 100; account++) {
-            const balance = await KwentaNFT.balanceOf(_to[account], 0)
-            expect(balance.toNumber()).to.eq(1)
-          }
-        })
-
-        it(`should have gave each tier 0 recipient 1 tier 0 KwentaNFT`, async () => {
           for (let account = 0; account < 100; account++) {
             const balance = await KwentaNFT.balanceOf(_to[account], 0)
             expect(balance.toNumber()).to.eq(1)
@@ -144,6 +143,9 @@ describe(`KwentaNFT (Optimism Kovan)`, () => {
         })
       })
 
+      /**
+       * @dev 4/5 PASS and 1 FAIL
+       */
       describe(`should nots`, () => {
         it(`should not have gave each tier 0 recipient any tier 1, 2, nor 3 KwentaNFTs`, async () => {
           for (let account = 0; account < 100; account++) {
@@ -157,6 +159,9 @@ describe(`KwentaNFT (Optimism Kovan)`, () => {
           }
         })
 
+        /**
+         * @todo Why does this fail?
+         */
         it(`should not have gave each tier 1 recipient any tier 0, 2, nor 3 KwentaNFTs`, async () => {
           for (let account = 100; account < 150; account++) {
             const balance0 = await KwentaNFT.balanceOf(_to[account], 0)
@@ -195,6 +200,9 @@ describe(`KwentaNFT (Optimism Kovan)`, () => {
       })
     })
 
+    /**
+     * @dev 1/2 PASS and 1 FAIL
+     */
     describe(`disableMint()`, () => {
       /**
        * @todo Extract error and use in `expect()` call
