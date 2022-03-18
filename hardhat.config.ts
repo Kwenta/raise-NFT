@@ -19,8 +19,11 @@ const config = {
         count: 5000
       }
     },
-    kovan: {
+    rinkeby: {
       url: 'https://rinkeby.infura.io/v3/' + process.env.INFURA_API_KEY
+    },
+    "optimism-kovan": {
+      url: 'https://optimism-kovan.infura.io/v3/' + process.env.INFURA_API_KEY
     },
   },
   gasReporter: {
@@ -31,7 +34,7 @@ const config = {
     apiKey: process.env.ETHERSCAN_API_KEY,
   },
   mocha: {
-    timeout: 100000
+    timeout: 200000
   }
 }
 
