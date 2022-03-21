@@ -9,7 +9,6 @@ import 'dotenv/config'
 
 /* Internal imports */
 import {KwentaNFT} from '../typechain/KwentaNFT'
-import {GorillaBits} from '../typechain/GorillaBits'
 import recipientPrivateKeys from '../recipientPrivateKeys.json'
 
 

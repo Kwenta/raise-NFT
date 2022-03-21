@@ -9,43 +9,28 @@ import 'dotenv/config'
 
 /* Internal imports */
 import {KwentaNFT} from '../typechain/KwentaNFT'
-import recipientPrivateKeys from '../recipientPrivateKeys.json'
+import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 
 
-describe(`KwentaNFT (Rinkeby)`, async () => {
+describe(`KwentaNFT (hardhat)`, () => {
   const uri = 'https://ipfs/<SAMPLE_URI>/'
-  const infuraRinkebyUrl = 'https://rinkeby.infura.io/v3/'
 
   let receipt: ContractReceipt,
     KwentaNFT: KwentaNFT,
     deployedCtc,
-    provider = new ethers.providers.JsonRpcProvider(
-      infuraRinkebyUrl + process.env.INFURA_API_KEY
-    ),
-    owner: Wallet,
-    l2Wallets: Wallet[] = [],
-    _to: string[] = []
+    owner: SignerWithAddress,
+    accounts: SignerWithAddress[],
+    _to: string[]
 
   describe(`tests`, () => {
     before(`tests`, async () => {
       // Create list of test recipients
-      const privKeys: string[] = recipientPrivateKeys.keys
+      accounts = await ethers.getSigners()
+      owner = accounts[0]
 
-      for (let i = 0; i < 206; i++) {
-        const privKey = privKeys[i]
-        const l2Wallet = new ethers.Wallet(privKey, provider)
-
-        l2Wallets.push(l2Wallet)
+      for (let i = 1; i < 206; i++) {
+        _to.push(accounts[i].address)
       }
-
-      l2Wallets.forEach((l2Wallet: Wallet) => {
-        _to.push(l2Wallet.address)
-      })
-
-      // Create owner account
-      const ownerPrivKey = process.env.PRIVATE_KEY as string
-
-      owner = new ethers.Wallet(ownerPrivKey, provider)
 
       const Factory__KwentaNFT = await ethers.getContractFactory('KwentaNFT')
 
