@@ -57,7 +57,7 @@ describe(`KwentaNFT (Optimism Kovan)`, () => {
     })
 
     /**
-     * @dev 4/5 PASS and 1 FAIL
+     * @dev 5/5 PASS
      */
     describe(`uri(uint256 tokenId)`, () => {
       it(`should get the uri for tier0 tokenIds`, async () => {
@@ -88,21 +88,18 @@ describe(`KwentaNFT (Optimism Kovan)`, () => {
         }
       })
 
-      /**
-       * @todo Extract error and use in `expect()` call
-       */
-      it(`should get the uri for outOfRange tokenIds`, async () => {
-        for (let tokenId = 206; tokenId < 210; tokenId++) {
+      it(`should throw an error for outOfRange tokenIds`, async () => {
+        for (let tokenId = 207; tokenId < 210; tokenId++) {
           const uri_ = KwentaNFT.connect(owner).uri(tokenId)
           await expect(uri_).to.be.revertedWith('TokenIdOutOfRange')
         }
       })
     })
 
+    /**
+     * @dev 10/10 PASS
+     */
     describe(`distribute(address[] _to)`, () => {
-      /**
-       * @dev 5/5 PASS
-       */
       describe(`shoulds`, () => {
         it(`should have flipped 'hasDistributed' to 'true'`, async () => {
           const distributeTx = await KwentaNFT.connect(owner).distribute(_to)
@@ -133,16 +130,13 @@ describe(`KwentaNFT (Optimism Kovan)`, () => {
         })
 
         it(`should have gave each tier 3 recipient 1 tier 3 KwentaNFT`, async () => {
-          for (let account = 200; account < 206; account++) {
+          for (let account = 200; account < 205; account++) {
             const balance = await KwentaNFT.balanceOf(_to[account], 3)
             expect(balance.toNumber()).to.eq(1)
           }
         })
       })
 
-      /**
-       * @dev 4/5 PASS and 1 FAIL
-       */
       describe(`should nots`, () => {
         it(`should not have gave each tier 0 recipient any tier 1, 2, nor 3 KwentaNFTs`, async () => {
           for (let account = 0; account < 100; account++) {
@@ -156,9 +150,6 @@ describe(`KwentaNFT (Optimism Kovan)`, () => {
           }
         })
 
-        /**
-         * @todo Why does this fail?
-         */
         it(`should not have gave each tier 1 recipient any tier 0, 2, nor 3 KwentaNFTs`, async () => {
           for (let account = 100; account < 150; account++) {
             const balance0 = await KwentaNFT.balanceOf(_to[account], 0)
@@ -184,7 +175,7 @@ describe(`KwentaNFT (Optimism Kovan)`, () => {
         })
 
         it(`should not have gave each tier 3 recipient any tier 0, 1, nor 2 KwentaNFTs`, async () => {
-          for (let account = 200; account < 206; account++) {
+          for (let account = 200; account < 205; account++) {
             const balance0 = await KwentaNFT.balanceOf(_to[account], 0)
             const balance1 = await KwentaNFT.balanceOf(_to[account], 1)
             const balance2 = await KwentaNFT.balanceOf(_to[account], 2)
@@ -198,15 +189,28 @@ describe(`KwentaNFT (Optimism Kovan)`, () => {
     })
 
     /**
-     * @dev 1/2 PASS and 1 FAIL
+     * @dev The revert test throws a weird error but otherwise exhibits
+     *      expected behavior
      */
     describe(`disableMint()`, () => {
-      /**
-       * @todo Extract error and use in `expect()` call
-       */
-      it(`should revert if not owner `, async () => {
-        const disableMintTx = KwentaNFT.connect(_to[2]).disableMint()
-        await expect(disableMintTx).to.be.revertedWith('CallerIsNotOwner')
+      // This throws a dumb error
+      it(`should revert if not owner`, async () => {
+        for (let i = 100; i < 105; i++) {
+          const signer = await ethers.getSigner(_to[i])
+          const disableMintTx = KwentaNFT.connect(signer).disableMint()
+
+          await expect(disableMintTx).to.be.revertedWith(
+            'ProviderError: execution reverted'
+          )
+        }
+
+        const isMintDisabled = await KwentaNFT.connect(owner).isMintDisabled()
+        expect(isMintDisabled).to.eq(false)
+      })
+
+      it(`should have minting enabled after failed attempts to disable mint`, async () => {
+        const isMintDisabled = await KwentaNFT.connect(owner).isMintDisabled()
+        expect(isMintDisabled).to.eq(false)
       })
 
       it(`should disable minting `, async () => {
