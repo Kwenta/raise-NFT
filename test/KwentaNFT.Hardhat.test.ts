@@ -20,7 +20,7 @@ describe(`KwentaNFT (hardhat)`, () => {
     deployedCtc,
     owner: SignerWithAddress,
     accounts: SignerWithAddress[],
-    _to: string[]
+    _to: string[] = []
 
   describe(`tests`, () => {
     before(`tests`, async () => {
