@@ -88,7 +88,7 @@ contract KwentaNFT is ERC1155 {
     }
 
     function distribute(address[] calldata _to) external payable {
-        if (msg.sender != owner) revert CallerIsNotOwner(owner);
+        if (owner != msg.sender) revert CallerIsNotOwner(owner);
         if (hasDistributed) revert HasDistributed(hasDistributed);
         if (isMintDisabled) revert MintIsDisabled(isMintDisabled);
 
@@ -127,8 +127,8 @@ contract KwentaNFT is ERC1155 {
     }
 
     // 7. Contract owner: Should be able to disable minting
-    function disableMint() public {
-        if (msg.sender != owner) revert CallerIsNotOwner(owner);
+    function disableMint() public payable {
+        if (owner != msg.sender) revert CallerIsNotOwner(owner);
         isMintDisabled = true;
     }
 }
