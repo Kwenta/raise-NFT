@@ -97,7 +97,7 @@ contract KwentaNFT is ERC1155 {
         uint256 tier1 = 1;
         uint256 tier2 = 2;
         uint256 tier3 = 3;
-        uint256 numIds = 207;
+        uint256 numIds = 206;
 
         for (uint256 i = 1; i < numIds; ) {
             to = _to[i - 1];
