@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv'
 
-import { HardhatUserConfig, task } from 'hardhat/config'
+import {HardhatUserConfig, task} from 'hardhat/config'
 import '@nomiclabs/hardhat-etherscan'
 import '@nomiclabs/hardhat-ganache'
 import '@nomiclabs/hardhat-waffle'
@@ -10,7 +10,7 @@ import 'solidity-coverage'
 
 dotenv.config()
 
-const config = {
+const config: HardhatUserConfig = {
   solidity: '0.8.10',
   networks: {
     hardhat: {
@@ -35,7 +35,7 @@ const config = {
   },
   mocha: {
     timeout: 200000
-  }
+  },
 }
 
 export default config

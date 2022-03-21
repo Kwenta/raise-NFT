@@ -1,18 +1,19 @@
 /* External imports */
-import { ethers } from 'hardhat'
-import { expect } from 'chai'
-import { ContractReceipt, ContractTransaction, utils } from 'ethers'
-import { Wallet } from '@ethersproject/wallet'
-import { Signer } from '@ethersproject/abstract-signer'
-import { JsonRpcProvider } from '@ethersproject/providers'
+import {ethers} from 'hardhat'
+import {expect} from 'chai'
+import {ContractReceipt, ContractTransaction, utils} from 'ethers'
+import {Wallet} from '@ethersproject/wallet'
+import {Signer} from '@ethersproject/abstract-signer'
+import {JsonRpcProvider} from '@ethersproject/providers'
 import 'dotenv/config'
 
 /* Internal imports */
-import { KwentaNFT } from '../typechain/KwentaNFT'
+import {KwentaNFT} from '../typechain/KwentaNFT'
+import {GorillaBits} from '../typechain/GorillaBits'
 import recipientPrivateKeys from '../recipientPrivateKeys.json'
 
 
-describe(`KwentaNFT (Rinkeby)`, () => {
+describe(`KwentaNFT (Rinkeby)`, async () => {
   const uri = 'https://ipfs/<SAMPLE_URI>/'
   const infuraRinkebyUrl = 'https://rinkeby.infura.io/v3/'
 
@@ -50,13 +51,9 @@ describe(`KwentaNFT (Rinkeby)`, () => {
       const Factory__KwentaNFT = await ethers.getContractFactory('KwentaNFT')
 
       KwentaNFT = await Factory__KwentaNFT.connect(owner).deploy(uri)
-      KwentaNFT.deployed()
+      await KwentaNFT.deployed()
 
       console.log(`\n KwentaNFT contract address: ${KwentaNFT.address} \n`)
-
-      deployedCtc = await KwentaNFT.deployTransaction.wait()
-
-      console.log(`Gas used to deploy: ${deployedCtc.gasUsed.toString()} gas \n`)
     })
 
     /**
