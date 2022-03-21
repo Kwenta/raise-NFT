@@ -2,7 +2,7 @@
   "scripts": {
     "clean": "rm -rf artifacts cache",
     "compile": "npx hardhat compile",
-    "test": "rinkeby hardhat test --network hardhat ./test/KwentaNFT.Rinkeby.test.ts",
+    "test": "rinkeby hardhat test --network hardhat ./test/KwentaNFT.Hardhat.test.ts",
     "test:rinkeby": "npx hardhat test --network rinkeby ./test/KwentaNFT.Rinkeby.test.ts",
     "test:optiKovan": "npx hardhat test --network 'optimism-kovan' ./test/KwentaNFT.OptimismKovan.test.ts"
   },
