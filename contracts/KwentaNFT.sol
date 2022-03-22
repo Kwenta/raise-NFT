@@ -5,19 +5,23 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@rari-capital/solmate/src/tokens/ERC1155.sol";
 
 error CallerIsNotOwner(address owner);
-error TokenIdOutOfRange(uint256 tokenId);
-error HasDistributed(bool hasDistributed);
 error MintIsDisabled(bool isMintingDisabled);
+error HasDistributed(bool hdt0, bool hdt1, bool hdt2, bool hdt3);
 
 contract KwentaNFT is ERC1155 {
     using Strings for uint256;
 
     // public state vars
     address public immutable owner;
-    bool public hasDistributed;
+    bool public hdt0; // hdt0 = hasDistributedTier0
+    bool public hdt1; // hdt1 = hasDistributedTier1
+    bool public hdt2; // hdt2 = hasDistributedTier2
+    bool public hdt3; // hdt3 = hasDistributedTier3
     bool public isMintDisabled;
     // private state vars
     string private baseURI;
+
+    mapping(uint256 => uint256) tokenIdToTier;
 
     constructor(string memory _baseURI) ERC1155() {
         baseURI = _baseURI;
@@ -43,14 +47,10 @@ contract KwentaNFT is ERC1155 {
 
     function getTierByTokenID(uint256 tokenId)
         public
-        pure
+        view
         returns (uint256 tierId)
     {
-        if (tokenId < 101) return 0;
-        if (tokenId > 100 && tokenId < 151) return 1;
-        if (tokenId > 150 && tokenId < 201) return 2;
-        if (tokenId > 200 && tokenId < 207) return 3;
-        if (tokenId > 206) revert TokenIdOutOfRange(tokenId);
+        return tokenIdToTier[tokenId];
     }
 
     function mint(
@@ -87,25 +87,25 @@ contract KwentaNFT is ERC1155 {
         _batchBurn(from, ids, amounts);
     }
 
-    function distribute(address[] calldata _to) external payable {
+    function distribute(
+        address[] calldata _to,
+        uint256[] calldata _tokenIds,
+        uint256 _tier
+    ) external payable {
         if (owner != msg.sender) revert CallerIsNotOwner(owner);
-        if (hasDistributed) revert HasDistributed(hasDistributed);
         if (isMintDisabled) revert MintIsDisabled(isMintDisabled);
+        if (hdt0 && hdt1 && hdt2 && hdt3)
+            revert HasDistributed(hdt0, hdt1, hdt2, hdt3);
 
         address to;
-        uint256 tier0 = 0;
-        uint256 tier1 = 1;
-        uint256 tier2 = 2;
-        uint256 tier3 = 3;
-        uint256 numIds = 206;
+        uint256 tokenId;
 
-        for (uint256 i = 1; i < numIds; ) {
-            to = _to[i - 1];
+        for (uint256 i = 0; i < _tokenIds.length; ) {
+            to = _to[i];
+            tokenId = _tokenIds[i];
+            tokenIdToTier[tokenId] = _tier;
 
-            if (i < 101) mintByTier(to, tier0);
-            if (i > 100 && i < 151) mintByTier(to, tier1);
-            if (i > 150 && i < 201) mintByTier(to, tier2);
-            if (i > 200) mintByTier(to, tier3);
+            _mint(to, _tier, 1, "");
 
             // An array can't have a total length
             // larger than the max uint256 value.
@@ -114,16 +114,14 @@ contract KwentaNFT is ERC1155 {
             }
         }
 
-        hasDistributed = true;
+        setHasDistributedTier(true, _tier);
     }
 
-    function mintByTier(address _to, uint256 _tier) internal {
-        uint256 quantity = 1;
-
-        if (_tier == 0) _mint(_to, _tier, quantity, "");
-        if (_tier == 1) _mint(_to, _tier, quantity, "");
-        if (_tier == 2) _mint(_to, _tier, quantity, "");
-        if (_tier == 3) _mint(_to, _tier, quantity, "");
+    function setHasDistributedTier(bool _value, uint256 _tier) internal {
+        if (_tier == 0) hdt0 = _value;
+        if (_tier == 1) hdt1 = _value;
+        if (_tier == 2) hdt2 = _value;
+        if (_tier == 3) hdt3 = _value;
     }
 
     // 7. Contract owner: Should be able to disable minting
