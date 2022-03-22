@@ -4,6 +4,7 @@ pragma solidity ^0.8.10;
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@rari-capital/solmate/src/tokens/ERC1155.sol";
 
+error InvalidTier(uint256 tier);
 error CallerIsNotOwner(address owner);
 error MintIsDisabled(bool isMintingDisabled);
 error HasDistributed(bool hdt0, bool hdt1, bool hdt2, bool hdt3);
@@ -92,8 +93,9 @@ contract KwentaNFT is ERC1155 {
         uint256[] calldata _tokenIds,
         uint256 _tier
     ) external payable {
-        if (owner != msg.sender) revert CallerIsNotOwner(owner);
+        if (_tier > 3) revert InvalidTier(_tier);
         if (isMintDisabled) revert MintIsDisabled(isMintDisabled);
+        if (owner != msg.sender) revert CallerIsNotOwner(owner);
         if (hdt0 && hdt1 && hdt2 && hdt3)
             revert HasDistributed(hdt0, hdt1, hdt2, hdt3);
 

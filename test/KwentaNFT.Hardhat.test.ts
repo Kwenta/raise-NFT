@@ -70,6 +70,15 @@ describe(`KwentaNFT (hardhat)`, () => {
      */
     describe(`distribute(address[] _to)`, () => {
       describe(`shoulds`, () => {
+        it(`should revert if invalid tier`, async () => {
+          const invalidTierTx = KwentaNFT.connect(owner).distribute(
+            _to[TIER_0],
+            _tokenIds[TIER_0],
+            4
+          )
+          await expect(invalidTierTx).to.be.revertedWith('InvalidTier')
+        })
+
         it(`should have distributed to tier 0 `, async () => {
           const distributeTier0Tx = await KwentaNFT.connect(owner).distribute(
             _to[TIER_0],
