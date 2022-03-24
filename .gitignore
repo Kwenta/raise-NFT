@@ -1,0 +1,23 @@
+/out
+
+.env
+.drawio.svg
+node_modules
+KwentaNFT.Rinkeby.test.ts
+KwentaNFT.OptimismKovan.test.ts
+coverage
+coverage.json
+typechain
+
+# Hardhat files
+cache
+artifacts
+
+# dapptools stuff
+src
+lib
+.dapprc
+Makefile
+remappings.txt
+.gitmodules
+.gitattributes

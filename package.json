@@ -1,0 +1,34 @@
+{
+  "scripts": {
+    "clean": "rm -rf artifacts cache",
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test --network hardhat ./test/KwentaNFT.Hardhat.test.ts",
+    "test:rinkeby": "npx hardhat test --network rinkeby ./test/KwentaNFT.Rinkeby.test.ts",
+    "test:optiKovan": "npx hardhat test --network 'optimism-kovan' ./test/KwentaNFT.OptimismKovan.test.ts"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.5",
+    "@nomiclabs/hardhat-etherscan": "^3.0.3",
+    "@nomiclabs/hardhat-ganache": "^2.0.1",
+    "@nomiclabs/hardhat-waffle": "^2.0.3",
+    "@openzeppelin/contracts": "^4.5.0",
+    "@rari-capital/solmate": "^6.2.0",
+    "@typechain/ethers-v5": "^7.2.0",
+    "@typechain/hardhat": "^2.3.1",
+    "@types/chai": "^4.3.0",
+    "@types/mocha": "^9.1.0",
+    "@types/node": "^12.20.47",
+    "@typescript-eslint/eslint-plugin": "^4.33.0",
+    "@typescript-eslint/parser": "^4.33.0",
+    "chai": "^4.3.6",
+    "dotenv": "^10.0.0",
+    "ethereum-waffle": "^3.4.0",
+    "ethers": "^5.6.0",
+    "hardhat": "^2.9.1",
+    "hardhat-gas-reporter": "^1.0.8",
+    "solidity-coverage": "^0.7.20",
+    "ts-node": "^10.7.0",
+    "typechain": "^5.2.0",
+    "typescript": "^4.6.2"
+  }
+}
