@@ -2,9 +2,8 @@
   "scripts": {
     "clean": "rm -rf artifacts cache",
     "compile": "npx hardhat compile",
-    "test": "npx hardhat test --network hardhat ./test/KwentaNFT.Hardhat.test.ts",
-    "test:rinkeby": "npx hardhat test --network rinkeby ./test/KwentaNFT.Rinkeby.test.ts",
-    "test:optiKovan": "npx hardhat test --network 'optimism-kovan' ./test/KwentaNFT.OptimismKovan.test.ts"
+    "test": "npx hardhat test --network hardhat ./test/RaiseNFT.hardhat.test.ts",
+    "test:rinkeby": "npx hardhat test --network rinkeby ./test/RaiseNFT.rinkeby.test.ts"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.5",
