@@ -11,7 +11,7 @@ import 'solidity-coverage'
 dotenv.config()
 
 const config: HardhatUserConfig = {
-  solidity: '0.8.10',
+  solidity: '0.8.13',
   networks: {
     hardhat: {
       accounts: {
