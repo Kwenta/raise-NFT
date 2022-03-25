@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity ^0.8.10;
+pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@rari-capital/solmate/src/tokens/ERC1155.sol";
@@ -54,40 +54,6 @@ contract KwentaNFT is ERC1155 {
         return tokenIdToTier[tokenId];
     }
 
-    function mint(
-        address to,
-        uint256 id,
-        uint256 amount,
-        bytes memory data
-    ) internal virtual {
-        _mint(to, id, amount, data);
-    }
-
-    function batchMint(
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
-    ) internal virtual {
-        _batchMint(to, ids, amounts, data);
-    }
-
-    function burn(
-        address from,
-        uint256 id,
-        uint256 amount
-    ) public virtual {
-        _burn(from, id, amount);
-    }
-
-    function batchBurn(
-        address from,
-        uint256[] memory ids,
-        uint256[] memory amounts
-    ) public virtual {
-        _batchBurn(from, ids, amounts);
-    }
-
     function distribute(
         address[] calldata _to,
         uint256[] calldata _tokenIds,
@@ -109,8 +75,6 @@ contract KwentaNFT is ERC1155 {
 
             _mint(to, _tier, 1, "");
 
-            // An array can't have a total length
-            // larger than the max uint256 value.
             unchecked {
                 ++i;
             }
@@ -126,7 +90,6 @@ contract KwentaNFT is ERC1155 {
         if (_tier == 3) hdt3 = _value;
     }
 
-    // 7. Contract owner: Should be able to disable minting
     function disableMint() public payable {
         if (owner != msg.sender) revert CallerIsNotOwner(owner);
         isMintDisabled = true;
