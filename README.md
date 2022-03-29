@@ -1,3 +1,3 @@
-# kwenta-nft
+# raise-NFT
 
 Kwenta Raise NFT

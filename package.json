@@ -2,7 +2,7 @@
   "scripts": {
     "clean": "rm -rf artifacts cache",
     "compile": "npx hardhat compile",
-    "test": "npx hardhat test --network hardhat ./test/KwentaNFT.Hardhat.test.ts"
+    "test": "npx hardhat test --network hardhat ./test/RaiseNFT.hardhat.test.ts"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.5",

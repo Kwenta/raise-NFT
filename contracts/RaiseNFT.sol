@@ -9,7 +9,7 @@ error CallerIsNotOwner(address owner);
 error MintIsDisabled(bool isMintingDisabled);
 error HasDistributed(bool hdt0, bool hdt1, bool hdt2, bool hdt3);
 
-contract KwentaNFT is ERC1155 {
+contract RaiseNFT is ERC1155 {
     using Strings for uint256;
 
     // public state vars
