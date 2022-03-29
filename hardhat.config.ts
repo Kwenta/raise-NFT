@@ -18,13 +18,7 @@ const config: HardhatUserConfig = {
         mnemonic: "test test test test test test test test test test test junk",
         count: 5000
       }
-    },
-    rinkeby: {
-      url: 'https://rinkeby.infura.io/v3/' + process.env.INFURA_API_KEY
-    },
-    "optimism-kovan": {
-      url: 'https://optimism-kovan.infura.io/v3/' + process.env.INFURA_API_KEY
-    },
+    }
   },
   gasReporter: {
     enabled: true,
